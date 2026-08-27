@@ -57,7 +57,7 @@ A **cross-platform tool** for managing Stardew Valley mods with **profiles, depe
 
 ### Command-Line Interface (CLI)
 
-Run commands like this:
+The CLI tool allows you to manage mods and profiles directly from the terminal. Run commands like this:
 
 ```bash
 python st_mod_manager_cli.py [command] [args]
@@ -95,14 +95,65 @@ python st_mod_manager_gui.py
 
 ---
 
+## 🏗️ How the Core Works
+
+The core script (`st_mod_manager_core.py`) is the backbone of the project. It handles all the logic for managing mods and profiles. Here’s a breakdown of its key components:
+
+### **1. Profile Management**
+
+- **`create_profile(name)`**: Creates a new profile with its own set of mods.
+- **`list_profiles()`**: Lists all existing profiles.
+- Profiles are stored in the `mod_manager/profiles/` directory, with each profile having its own `mods` folder.
+
+### **2. Mod Installation**
+
+- **`install_mod(profile, mod_path)`**: Installs a mod from a `.zip` file or folder into a profile.
+  - Extracts the mod to a temporary directory.
+  - Detects the mod root folder containing `manifest.json` or `modinfo.json`.
+  - Moves the mod to the profile’s `mods` folder.
+  - Records the mod’s version, path, and source in the database (`profiles.json`).
+
+### **3. Dependency Checking**
+
+- **`check_profile(profile)`**: Validates mods and dependencies for a profile.
+  - Reads `manifest.json` or `modinfo.json` for each mod.
+  - Checks for missing dependencies (including `ContentPackFor`).
+  - Reports missing dependencies or mods.
+
+### **4. Profile Activation**
+
+- **`use_profile(profile, game_dir)`**: Activates a profile by linking its `mods` folder to the game’s `Mods` directory.
+  - Uses symlinks (Linux/macOS) or directory junctions (Windows).
+  - Ensures the game’s `Mods` folder is empty or a link/junction before proceeding.
+
+### **5. Mod Removal**
+
+- **`remove_mod(profile, mod_name)`**: Removes a mod from a profile.
+  - Deletes the mod’s folder from the profile’s `mods` directory.
+  - Removes the mod’s entry from the database.
+
+### **6. Cross-Platform Linking**
+
+- **`_make_link(src, dst)`**: Creates symlinks (Linux/macOS) or directory junctions (Windows).
+- **`_is_junction(p)`**: Checks if a path is a Windows directory junction.
+- **`_junction_target(p)`**: Resolves the target path of a Windows junction.
+
+### **7. Database Management**
+
+- **`_load_db()`**: Loads the profiles database (`profiles.json`).
+- **`_save_db(db)`**: Saves the current state of the database.
+- Automatically recovers from missing or malformed `profiles.json`.
+
+---
+
 ## 📂 Project Structure
 
 ```
 stardew-mod-manager/
-├── st_mod_manager_core.py   # Core logic
-├── st_mod_manager_cli.py    # CLI interface
-├── st_mod_manager_gui.py    # GUI interface
-├── requirements.txt         # Dependencies
+├── st_mod_manager_core.py   # Core logic for managing mods and profiles
+├── st_mod_manager_cli.py    # Command-line interface
+├── st_mod_manager_gui.py    # Graphical user interface
+├── requirements.txt          # Dependencies
 └── README.md                # This file
 ```
 
