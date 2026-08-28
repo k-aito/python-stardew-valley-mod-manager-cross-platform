@@ -76,7 +76,7 @@ def default_steam_dir() -> Path:
     if sys.platform.startswith("win"):
         return Path(os.getenv("PROGRAMFILES(X86)", "C:\\Program Files (x86)")) / "Steam" / "steamapps" / "common" / "Stardew Valley"
     if sys.platform == "darwin":
-        return home / "Library/Application Support/Steam/steamapps/common/Stardew Valley"
+        return home / "Library/Application Support/Steam/steamapps/common/Stardew Valley/Contents/MacOS"
     return home / ".steam/steam/steamapps/common/Stardew Valley"
 
 # ----------------------------------------------------------------------
@@ -311,11 +311,20 @@ def use_profile(profile: str, game_dir: Path = None) -> str:
             mods_dir.unlink()
         else:
             bad_items = [p for p in mods_dir.iterdir()]
-            return f'⚠️ The existing Mods is not a link or junction and contains regular files/folders: {" ".join(str(p) for p in bad_items)}. Please move or delete them before switching profiles.'
+
+            # Prepare the list of bad items as a single string
+            bad_list = "\n".join(f"- {p}" for p in bad_items)
+
+            # Now insert it into the message
+            return (
+                f"⚠️ The existing Mods is not a link or junction and contains regular "
+                f"files/folders:\n{bad_list}. Please move or delete them before "
+                f"switching profiles."
+            )
     try:
         _make_link(src, mods_dir)
         CURRENT_FILE.write_text(profile)
-        return f'✅ Profile "{profile}" is now the active SMAPI mods set. Linked {mods_dir} → {src}'
+        return f'✅ Profile "{profile}" is now the active SMAPI mods set.\nLinked {mods_dir} → {src}'
     except Exception as exc:
         return f'❌ Failed to link profile: {exc}'
 
