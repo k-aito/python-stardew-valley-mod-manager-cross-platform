@@ -2,7 +2,7 @@
 
 A **cross-platform tool** for managing Stardew Valley mods with **profiles, dependency checking, and safe linking**.  
 
-**Note:** This project was created with the assistance of AI and is only tested on Linux and MacOS with a Steam version of Stardew Valley.
+**Note:** This project was created with the assistance of AI and is only tested on Linux (CLI) and MacOS (CLI) with a Steam version of Stardew Valley.
 
 ---
 
